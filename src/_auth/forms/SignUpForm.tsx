@@ -16,9 +16,11 @@ import { SignUpValidation } from "@/lib/validation"
 import { Loader } from "lucide-react"
 import { Link } from "react-router-dom"
 import { createUserAccount } from "@/lib/appwrite/api"
+import { useToast } from "@/hooks/use-toast"
 
 
 const SignUpForm = () => {
+  const { toast } = useToast();
 
   const isLoading = false;
 
@@ -38,6 +40,13 @@ const SignUpForm = () => {
     const newUser = await createUserAccount(values);
 
     console.log(newUser);
+    if (!newUser) {
+      return toast({
+        title: "Sign up failed. Please try again",
+      });
+    }
+
+    // const session = await signInAccount()
   }
 
   return (
