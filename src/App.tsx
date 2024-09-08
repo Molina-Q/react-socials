@@ -3,8 +3,10 @@ import SignInForm from './_auth/forms/SignInForm';
 import SignUpForm from './_auth/forms/SignUpForm';
 import { Home } from './_root/pages';
 import RootLayout from './_root/RootLayout';
+import { Toaster } from './components/ui/toaster';
 import './globals.css';
 import { Routes, Route } from 'react-router-dom';
+
 
 const App = () => {
   return (
@@ -22,6 +24,7 @@ const App = () => {
         </Route>
       </Routes>
 
+      <Toaster />
     </main>
   )
 }
