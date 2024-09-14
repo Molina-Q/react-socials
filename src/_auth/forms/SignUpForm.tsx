@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,12 +16,13 @@ import { Loader } from "lucide-react"
 import { Link } from "react-router-dom"
 import { createUserAccount } from "@/lib/appwrite/api"
 import { useToast } from "@/hooks/use-toast"
+import { userCreateUserAccountMutation, useSignInAccount } from "@/lib/react-query/querysAndMutations"
 
 
 const SignUpForm = () => {
   const { toast } = useToast();
-
-  const isLoading = false;
+  const { mutateAsync: createUserAccount, isLoading: isCreatingUser } = userCreateUserAccountMutation();
+  const { mutateAsync: signInAccount, isLoading: isSigningIn } = useSignInAccount();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof SignUpValidation>>({
@@ -46,7 +46,16 @@ const SignUpForm = () => {
       });
     }
 
-    // const session = await signInAccount()
+    const session = await signInAccount({
+      email: values.email,
+      password: values.password,
+    })
+
+    if (!session) {
+      return toast({
+        title: "Sign in failed. Please try again",
+      });
+    }
   }
 
   return (
@@ -118,7 +127,7 @@ const SignUpForm = () => {
         <Button type="submit" className="shad-button_primary">
 
           {
-            isLoading ? (<div className="flex center gap-2">
+            isCreatingUser ? (<div className="flex center gap-2">
               <Loader /> Loading...
             </div>) : ("Sign up")
           }
