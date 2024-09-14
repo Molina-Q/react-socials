@@ -13,16 +13,19 @@ import {
 import { Input } from "@/components/ui/input"
 import { SignUpValidation } from "@/lib/validation"
 import { Loader } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { createUserAccount } from "@/lib/appwrite/api"
 import { useToast } from "@/hooks/use-toast"
 import { userCreateUserAccountMutation, useSignInAccount } from "@/lib/react-query/querysAndMutations"
+import { useUserContext } from "@/context/AuthContext"
 
 
 const SignUpForm = () => {
   const { toast } = useToast();
   const { mutateAsync: createUserAccount, isLoading: isCreatingUser } = userCreateUserAccountMutation();
   const { mutateAsync: signInAccount, isLoading: isSigningIn } = useSignInAccount();
+  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
+  const navigate = useNavigate();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof SignUpValidation>>({
@@ -52,9 +55,16 @@ const SignUpForm = () => {
     })
 
     if (!session) {
-      return toast({
-        title: "Sign in failed. Please try again",
-      });
+      return toast({title: "Sign in failed. Please try again",});
+    }
+
+    const isLoggedIn = await checkAuthUser();
+
+    if (isLoggedIn) {
+      form.reset();
+      navigate("/");
+    } else {
+      toast({title: "Sign in failed. Please try again"});
     }
   }
 
